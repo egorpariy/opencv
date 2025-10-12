@@ -49,8 +49,6 @@
 
 # Download
 
-https://github.com/nihui/opencv-mobile/releases/latest
-
 <table>
 <tr>
 <td>
@@ -539,51 +537,6 @@ make install
 zip -r -9 opencv-mobile-4.12.0-mypackage.zip install
 ```
 
-# Some notes
-
-* The minimal opencv build contains most basic opencv operators and common image processing functions, with some handy additions like keypoint feature extraction and matching, image inpainting and opticalflow estimation.
-
-* Many computer vision algorithms that reside in dedicated modules are discarded, such as face detection etc. [You could try deep-learning based algorithms with neural network inference library optimized for mobile.](https://github.com/Tencent/ncnn)
-
-* Image IO functions in highgui module, like ```cv::imread``` and ```cv::imwrite```, are re-implemented using [stb](https://github.com/nothings/stb) for smaller code size. GUI functions, like ```cv::imshow```, are discarded.
-
-* cuda and opencl are disabled because there is no cuda on mobile, no opencl on ios, and opencl on android is slow. opencv on gpu is not suitable for real productions. Write metal on ios and opengles/vulkan on android if you need good gpu acceleration.
-
-* C++ RTTI and exceptions are disabled for minimal build on mobile platforms and webassembly build. Be careful when you write ```cv::Mat roi = image(roirect);```  :P
-
-## `cv::putText` supports full-width CJK characters
-
-1. Open https://nihui.github.io/opencv-mobile/patches/fontface.html or `opencv-mobile-X.Y.Z/fontface.html` in your browser.
-2. In the opened page, enter all the text to be drawn, select the TTF font file (optional), click the `Convert to Font Header` button to download the fontface header. This step is completely local operation, without connecting to a remote server, your data is private and safe.
-3. Include the generated fontface header, initialize a fontface instance, and pass it as the argument to `cv::putText`. The source file must be encoded in UTF-8.
-
-Since all characters have been converted to embedded bitmap, the drawing routine does not depend on freetype library or any font files at runtime.
-
-```cpp
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include "myfontface.h"
-
-int main()
-{
-    cv::Mat bgr = cv::imread("atari.jpg", 1);
-
-    // use this font
-    MyFontFace myfont;
-
-    // draw full-width text with myfont
-    const char* zhtext = "称呼机器人为破铜烂铁，\n违反了禁止歧视机器人法！";
-    cv::putText(bgr, zhtext, cv::Point(30, 250), cv::Scalar(127, 0, 127), myfont, 20);
-
-    // get bounding rect
-    cv::Rect rr = cv::getTextSize(bgr.size(), zhtext, cv::Point(30, 250), myfont, 20);
-
-    cv::imwrite("out.jpg", bgr);
-
-    return 0;
-}
-```
 
 ## `cv::imshow` supports Linux framebuffer and Windows
 
